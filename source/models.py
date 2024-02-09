@@ -112,6 +112,7 @@ class ModelFactory:
                         patch_size=model_options.patch_size,
                         embed_dim_patch=model_options.embed_dim_patch,
                         embed_dim_region=model_options.embed_dim_region,
+                        embed_dim_slide = model_options.embed_dim_slide, #added by judith
                         pretrain_vit_region=model_options.pretrain_vit_region,
                         freeze_vit_region=model_options.freeze_vit_region,
                         freeze_vit_region_pos_embed=model_options.freeze_vit_region_pos_embed,
@@ -163,6 +164,7 @@ class ModelFactory:
                         num_classes=num_classes,
                         region_size=model_options.region_size,
                         patch_size=model_options.patch_size,
+                        embed_dim_slide=model_options.embed_dim_slide, #added by judith
                         pretrain_vit_region=model_options.pretrain_vit_region,
                         freeze_vit_region=model_options.freeze_vit_region,
                         freeze_vit_region_pos_embed=model_options.freeze_vit_region_pos_embed,
@@ -280,6 +282,7 @@ class LocalGlobalHIPT(nn.Module):
         pretrain_vit_region: Optional[str] = None,
         embed_dim_patch: int = 384,
         embed_dim_region: int = 192,
+        embed_dim_slide: int = 768, #added by judith
         freeze_vit_region: bool = True,
         freeze_vit_region_pos_embed: bool = True,
         dropout: float = 0.25,
@@ -337,7 +340,7 @@ class LocalGlobalHIPT(nn.Module):
 
         # Global Aggregation
         self.global_phi = nn.Sequential(
-            nn.Linear(embed_dim_region, 192), nn.ReLU(), nn.Dropout(dropout)
+            nn.Linear(embed_dim_region, embed_dim_slide), nn.ReLU(), nn.Dropout(dropout)
         )
 
         if self.slide_pos_embed.use:
@@ -357,22 +360,22 @@ class LocalGlobalHIPT(nn.Module):
 
         self.global_transformer = nn.TransformerEncoder(
             nn.TransformerEncoderLayer(
-                d_model=192,
+                d_model=embed_dim_slide,
                 nhead=3,
-                dim_feedforward=192,
+                dim_feedforward=embed_dim_slide,
                 dropout=dropout,
                 activation="relu",
             ),
             num_layers=2,
         )
         self.global_attn_pool = Attn_Net_Gated(
-            L=192, D=192, dropout=dropout, num_classes=1
+            L=embed_dim_slide, D=embed_dim_slide, dropout=dropout, num_classes=1
         )
         self.global_rho = nn.Sequential(
-            *[nn.Linear(192, 192), nn.ReLU(), nn.Dropout(dropout)]
+            *[nn.Linear(embed_dim_slide, embed_dim_slide), nn.ReLU(), nn.Dropout(dropout)]
         )
 
-        self.classifier = nn.Linear(192, num_classes)
+        self.classifier = nn.Linear(embed_dim_slide, num_classes)
 
     def forward(self, x, pct: Optional[torch.Tensor] = None, pct_thresh: float = 0.0):
         mask_patch = None
@@ -1427,6 +1430,7 @@ class LocalGlobalRegressionHIPT(LocalGlobalHIPT):
         pretrain_vit_region: Optional[str] = None,
         embed_dim_patch: int = 384,
         embed_dim_region: int = 192,
+        embed_dim_slide: int = 768,
         freeze_vit_region: bool = True,
         freeze_vit_region_pos_embed: bool = True,
         dropout: float = 0.25,
@@ -1441,6 +1445,7 @@ class LocalGlobalRegressionHIPT(LocalGlobalHIPT):
             pretrain_vit_region,
             embed_dim_patch,
             embed_dim_region,
+            embed_dim_slide,
             freeze_vit_region,
             freeze_vit_region_pos_embed,
             dropout,
