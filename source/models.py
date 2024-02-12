@@ -403,7 +403,7 @@ class LocalGlobalHIPT(nn.Module):
         att = F.softmax(att, dim=1)
         x_att = torch.mm(att, x)
         x_wsi = self.global_rho(x_att)
-
+        #here error
         logits = self.classifier(x_wsi)
 
         return logits
@@ -1453,4 +1453,4 @@ class LocalGlobalRegressionHIPT(LocalGlobalHIPT):
             mask_attn_region,
             img_size_pretrained,
         )
-        self.classifier = nn.Linear(192, 1)
+        self.classifier = nn.Linear(embed_dim_slide, 1) 

@@ -5,7 +5,7 @@ data:
 
 features_root_dir: '/data/pathology/projects/ais-cap/judith/Projects/hipt/output/panda/feature_extraction/2023-12-12_15_16'
 output_dir: 'output/panda'
-experiment_name: 'classification_hipt'
+experiment_name: 'hipt_region_dim_192'
 level: 'local'
 
 nepochs: 200  #used to be 200 before
@@ -53,7 +53,8 @@ model:
   embed_dim_slide: 768
   region_size: 2048
   patch_size: 256
-  mask_attn: False
+  mask_attn_patch: False
+  mask_attn_region: False
   dropout: 0.25
   agg_method: 'concat'
   slide_pos_embed:
