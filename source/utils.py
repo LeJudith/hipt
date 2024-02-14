@@ -1084,7 +1084,7 @@ def train_regression(
             x, label = x.to(device, non_blocking=True), label.to(
                 device, non_blocking=True
             )
-            logits = model(x)
+            logits, _ = model(x)
             loss = criterion(logits, label.unsqueeze(1))
 
             loss_value = loss.item()
@@ -1167,7 +1167,8 @@ def tune_regression(
                 x, label = x.to(device, non_blocking=True), label.to(
                     device, non_blocking=True
                 )
-                logits = model(x)
+                logits, _  = model(x) #added by judith
+              
                 loss = criterion(logits, label.unsqueeze(1))
 
                 pred = get_label_from_regression_logits(
@@ -1236,7 +1237,7 @@ def test_regression(
                 x, label = x.to(device, non_blocking=True), label.to(
                     device, non_blocking=True
                 )
-                logits = model(x)
+                logits,_ = model(x)
 
                 pred = get_label_from_regression_logits(
                     logits.cpu(), dataset.num_classes

@@ -406,7 +406,7 @@ class LocalGlobalHIPT(nn.Module):
         #here error
         logits = self.classifier(x_wsi)
 
-        return logits
+        return logits, x_wsi
 
     def relocate(self, gpu_id: int = -1):
         device = get_device(gpu_id)
